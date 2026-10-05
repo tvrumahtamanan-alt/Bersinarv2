@@ -219,7 +219,7 @@ async def close_shift(sid: str, body: ShiftCloseIn, user=Depends(require("shift.
 async def list_shifts(location: Optional[str] = None, cashier_id: Optional[str] = None, date_from: Optional[str] = None,
                       date_to: Optional[str] = None, user=Depends(get_current_user)):
     q = {"location_name": {"$in": loc_filter(user, location)}}
-    if "shift.view_all" not in user["permissions"]:
+    if not {"shift.view_all", "reports.shift"} & set(user["permissions"]):
         q["cashier_id"] = user["id"]
     elif cashier_id:
         q["cashier_id"] = cashier_id

@@ -43,6 +43,7 @@ PERMISSIONS = [
     ("customers.credit_limit", "Pelanggan & Bon", "Ubah limit kredit"),
     ("customers.payment", "Pelanggan & Bon", "Catat pelunasan bon"),
     ("reports.sales", "Laporan", "Laporan penjualan"),
+    ("reports.shift", "Laporan", "Laporan per shift"),
     ("reports.pnl", "Laporan", "Laporan Laba Rugi"),
     ("reports.waste", "Laporan", "Laporan barang rusak"),
     ("reports.receivables", "Laporan", "Laporan piutang"),

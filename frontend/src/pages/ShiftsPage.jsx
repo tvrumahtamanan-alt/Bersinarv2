@@ -10,7 +10,7 @@ import { Numpad } from "@/components/Numpad";
 import { Modal, Field, Empty, LocSelect } from "@/components/Modal";
 import { PrintModal } from "@/components/PrintModal";
 
-function Summary({ s }) {
+export function Summary({ s }) {
   const row = (l, v, b) => <div className={`flex justify-between ${b ? "font-bold" : ""}`}><span>{l}</span><span className="mono">{v}</span></div>;
   return (
     <div className="text-sm space-y-1">

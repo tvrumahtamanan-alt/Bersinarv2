@@ -3,7 +3,10 @@ import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
 import { rp, fq, fdt, today } from "@/lib/format";
 import { useFetch } from "@/hooks/usePos";
-import { Tabs, Empty, LocSelect } from "@/components/Modal";
+import { shiftText } from "@/lib/printer";
+import { Tabs, Empty, LocSelect, Modal } from "@/components/Modal";
+import { PrintModal } from "@/components/PrintModal";
+import { Summary } from "@/pages/ShiftsPage";
 
 const firstOfMonth = () => `${today().slice(0, 8)}01`;
 const Stat = ({ l, v, cls = "", testid }) => <div className="card p-3"><div className="label">{l}</div><div data-testid={testid} className={`mono font-bold text-xl ${cls}`}>{v}</div></div>;
@@ -18,6 +21,40 @@ function Sales({ p }) {
       <div className="card p-3"><div className="font-bold mb-2">Per Metode Bayar</div>{Object.entries(data.by_method).map(([m, v]) => <div key={m} className="flex justify-between text-sm py-1 border-b border-slate-100"><span>{m}</span><b className="mono">{rp(v)}</b></div>)}{!Object.keys(data.by_method).length && <Empty />}</div>
       <div className="card p-3"><div className="font-bold mb-2">Harian</div>{data.by_day.map((d) => <div key={d.date} className="flex justify-between text-sm py-1 border-b border-slate-100"><span>{d.date} · {d.count} trx</span><b className="mono">{rp(d.total)}</b></div>)}{!data.by_day.length && <Empty />}</div>
     </div>
+  </>);
+}
+
+function ShiftReport({ p }) {
+  const { store } = useAuth();
+  const [cashier, setCashier] = useState("");
+  const [detail, setDetail] = useState(null);
+  const [print, setPrint] = useState(null);
+  const { data } = useFetch(async () => (await api.get("/shifts", { params: p })).data, [JSON.stringify(p)]);
+  const all = data || [];
+  const cashiers = [...new Map(all.map((s) => [s.cashier_id, s.cashier_name])).entries()];
+  const rows = all.filter((s) => !cashier || s.cashier_id === cashier);
+  const sum = (k) => rows.reduce((a, s) => a + (s[k] || 0), 0);
+  return (<>
+    <div className="flex flex-wrap gap-2 mb-3">
+      <select data-testid="rep-shift-cashier" className="input !h-10 !w-auto" value={cashier} onChange={(e) => setCashier(e.target.value)}><option value="">Semua Kasir</option>{cashiers.map(([id, n]) => <option key={id} value={id}>{n}</option>)}</select>
+    </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2"><Stat l="Jumlah Shift" v={rows.length} testid="rep-shift-count" /><Stat l="Total Penjualan" v={rp(sum("sales_total"))} testid="rep-shift-sales" />
+      <Stat l="Total Pengeluaran" v={rp(sum("expenses_total"))} /><Stat l="Total Selisih Kas" v={rp(sum("difference"))} cls={sum("difference") < 0 ? "text-red-600" : ""} /></div>
+    <div className="card overflow-x-auto mt-3"><table className="w-full min-w-[760px]">
+      <thead><tr><th className="th">Kasir</th><th className="th">Lokasi</th><th className="th">Buka</th><th className="th">Tutup</th><th className="th text-right">Trx</th><th className="th text-right">Penjualan</th><th className="th text-right">Pengeluaran</th><th className="th text-right">Kas Seharusnya</th><th className="th text-right">Selisih</th></tr></thead>
+      <tbody>{rows.map((s) => (
+        <tr key={s.id} data-testid={`rep-shift-row-${s.id}`} onClick={() => setDetail(s)} className="cursor-pointer hover:bg-slate-50 active:bg-slate-100">
+          <td className="td font-semibold">{s.cashier_name}</td><td className="td">{s.location_name}</td><td className="td whitespace-nowrap text-xs">{fdt(s.opened_at)}</td>
+          <td className="td whitespace-nowrap text-xs">{s.status === "open" ? <span className="badge bg-emerald-100 text-emerald-800 border-emerald-300">Aktif</span> : fdt(s.closed_at)}</td>
+          <td className="td text-right mono">{s.tx_count}</td><td className="td text-right mono">{rp(s.sales_total)}</td><td className="td text-right mono">{rp(s.expenses_total)}</td>
+          <td className="td text-right mono">{rp(s.expected_cash)}</td><td className={`td text-right mono ${s.difference < 0 ? "text-red-600" : ""}`}>{s.difference === null ? "-" : rp(s.difference)}</td>
+        </tr>))}</tbody>
+    </table>{!rows.length && <Empty text="Belum ada shift pada periode ini" />}</div>
+    <Modal open={!!detail && !print} onClose={() => setDetail(null)} title={`Rekap Shift · ${detail?.cashier_name || ""}`} testid="rep-shift-detail"
+      footer={detail?.status === "closed" && <button data-testid="rep-shift-print" className="btn btn-primary w-full" onClick={() => setPrint(detail)}>Cetak Rekap Shift</button>}>
+      {detail && <><div className="text-xs text-slate-500 mb-2">{detail.location_name} · {fdt(detail.opened_at)} – {fdt(detail.closed_at)}</div><Summary s={detail} /></>}
+    </Modal>
+    <PrintModal open={!!print} onClose={() => setPrint(null)} title="Rekap Shift" text={print ? shiftText(print, store) : ""} testid="rep-shift-print-modal" />
   </>);
 }
 
@@ -66,7 +103,7 @@ function Expenses({ p }) {
 
 export default function ReportsPage() {
   const { user, can } = useAuth();
-  const tabs = [can("reports.sales") && ["sales", "Penjualan"], can("reports.pnl") && ["pnl", "Laba Rugi"], can("reports.waste") && ["waste", "Barang Rusak"],
+  const tabs = [can("reports.sales") && ["sales", "Penjualan"], can("reports.shift") && ["shift", "Per Shift"], can("reports.pnl") && ["pnl", "Laba Rugi"], can("reports.waste") && ["waste", "Barang Rusak"],
     can("reports.receivables") && ["recv", "Piutang"], can("reports.pnl", "shift.view_all") && ["exp", "Pengeluaran"]].filter(Boolean);
   const [tab, setTab] = useState(tabs[0]?.[0]);
   const [f, setF] = useState({ date_from: firstOfMonth(), date_to: today(), location: "" });
@@ -81,7 +118,7 @@ export default function ReportsPage() {
         <LocSelect all value={f.location} onChange={(v) => setF({ ...f, location: v })} options={user.allowed_locations} testid="rep-loc" />
       </div>}
       <div className="mt-3">
-        {tab === "sales" && <Sales p={p} />}{tab === "pnl" && <Pnl p={p} />}{tab === "waste" && <Waste p={p} />}{tab === "recv" && <Receivables />}{tab === "exp" && <Expenses p={p} />}
+        {tab === "sales" && <Sales p={p} />}{tab === "shift" && <ShiftReport p={p} />}{tab === "pnl" && <Pnl p={p} />}{tab === "waste" && <Waste p={p} />}{tab === "recv" && <Receivables />}{tab === "exp" && <Expenses p={p} />}
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ Admin/Pemilik, Kasir cabang, Staf Gudang, Pelanggan umum, Pelanggan B2B.
 - Online shop (branch, categories, search, decimal, Habis, pickup/delivery, QRIS/Transfer/COD/Bon B2B login, tracking); POS order inbox with popup+sound, status flow, atomic stock on accept, cancel restores
 - Reports: sales, P&L, waste, receivables, expenses
 - Tested: iteration_1 backend 27/27 pass, frontend flows pass
+- 2026-10-05: Laporan → tab "Per Shift" (filter tanggal/lokasi/kasir, ringkasan, detail + cetak rekap) dan hak akses baru "Laporan per shift" (reports.shift)
 
 ## Notes
 - POS sales may drive stock negative by design (offline/physical sales); online orders are strictly guarded.

@@ -20,7 +20,7 @@ export const NAV = [
   ["/low-stock", "Stok Menipis & Kulakan", ["stock.low"]],
   ["/waste", "Barang Rusak", ["stock.waste"]],
   ["/customers", "Pelanggan & Bon", ["customers.manage", "customers.payment", "customers.credit_limit"]],
-  ["/reports", "Laporan", ["reports.sales", "reports.pnl", "reports.waste", "reports.receivables"]],
+  ["/reports", "Laporan", ["reports.sales", "reports.shift", "reports.pnl", "reports.waste", "reports.receivables"]],
   ["/settings", "Pengaturan", ["settings.users", "settings.roles", "settings.store", "settings.expense_cats"]],
 ];
 
