@@ -1,0 +1,67 @@
+{
+  "project": "BERSINAR POS & Stok Gudang",
+  "app_type": "hybrid_fullstack",
+  "language": "Bahasa Indonesia",
+  "design_system": {
+    "style": "Tailwind CSS Clean Flat Design",
+    "theme_rules": "No shadows, no backdrop-blur, no heavy gradients, no popup animations, instant visual feedback, high contrast",
+    "typography": {
+      "font_family_main": "'Plus Jakarta Sans', sans-serif",
+      "font_family_mono": "'JetBrains Mono', monospace",
+      "google_fonts_import": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
+      "rules": "Large Rupiah amounts in bold monospace. Headings in Plus Jakarta Sans. Explicit text hierarchy."
+    },
+    "colors": {
+      "--bg-app": "#F8FAFC",
+      "--surface": "#FFFFFF",
+      "--surface-hover": "#F1F5F9",
+      "--primary": "#16A34A",
+      "--primary-hover": "#15803D",
+      "--primary-light": "#DCFCE7",
+      "--text-main": "#0F172A",
+      "--text-muted": "#64748B",
+      "--border": "#CBD5E1",
+      "--border-focus": "#16A34A",
+      "--danger": "#DC2626",
+      "--danger-light": "#FEE2E2",
+      "--warning": "#D97706",
+      "--warning-light": "#FEF3C7",
+      "--info": "#2563EB",
+      "--info-light": "#DBEAFE"
+    },
+    "tailwind_classes": {
+      "card": "bg-white border-2 border-slate-200 rounded-lg p-3 sm:p-4 hover:border-emerald-600 active:bg-slate-50",
+      "button_primary": "bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg border border-emerald-700 active:scale-[0.99] text-base cursor-pointer disabled:opacity-50",
+      "button_secondary": "bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-3 px-4 rounded-lg border border-slate-300 active:scale-[0.99] text-base cursor-pointer",
+      "button_danger": "bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg border border-red-700 text-base cursor-pointer",
+      "input": "bg-white border-2 border-slate-300 rounded-lg px-3 py-2.5 text-slate-900 focus:border-emerald-600 focus:outline-none text-base w-full",
+      "badge_stock_low": "bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold px-2 py-0.5 rounded",
+      "badge_stock_ok": "bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-2 py-0.5 rounded",
+      "numpad_btn": "bg-slate-100 hover:bg-slate-200 text-slate-900 text-xl font-bold rounded-lg border-2 border-slate-300 active:bg-emerald-600 active:text-white h-14 flex items-center justify-center cursor-pointer"
+    }
+  },
+  "layout_architecture": {
+    "viewport": "h-[100dvh] overflow-hidden flex flex-col bg-slate-100",
+    "pos_tablet_split": {
+      "left_catalog_width": "w-full lg:w-[62%] h-full flex flex-col border-r-2 border-slate-300 bg-slate-50",
+      "right_cart_width": "hidden lg:flex lg:w-[38%] h-full flex-col bg-white",
+      "catalog_grid": "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 p-3 overflow-y-auto"
+    },
+    "pos_mobile_view": {
+      "catalog_grid": "grid grid-cols-2 gap-2 p-2 pb-24",
+      "floating_cart_bar": "fixed bottom-0 left-0 right-0 lg:hidden bg-emerald-800 text-white p-3 border-t-2 border-emerald-900 flex justify-between items-center z-40",
+      "bottom_sheet_cart": "fixed inset-x-0 bottom-0 top-12 z-50 bg-white border-t-4 border-emerald-600 flex flex-col"
+    },
+    "numpad_modal": "fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4"
+  },
+  "images": {
+    "vegetable_store_hero": "https://images.unsplash.com/photo-1606237906294-ae86d103d715?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHw0fHxmcmVzaCUyMHZlZ2V0YWJsZXMlMjBncm9jZXJ5JTIwc3RvcmUlMjBwcm9kdWNlJTIwZGlzcGxheXxlbnwwfHx8fDE3OTExODc1NzB8MA&ixlib=rb-4.1.0&q=85",
+    "produce_display": "https://images.unsplash.com/photo-1573481078935-b9605167e06b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwzfHxmcmVzaCUyMHZlZ2V0YWJsZXMlMjBncm9jZXJ5JTIwc3RvcmUlMjBwcm9kdWNlJTIwZGlzcGxheXxlbnwwfHx8fDE3OTExODc1NzB8MA&ixlib=rb-4.1.0&q=85",
+    "fresh_groceries": "https://images.pexels.com/photos/5498219/pexels-photo-5498219.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+  },
+  "general_guidelines": {
+    "testing": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g. data-testid='pos-catalog-search-input', data-testid='cart-item-increment-btn').",
+    "performance": "No transition-all, no backdrop-blur, no shadow effects. Instant state updates and offline resilience.",
+    "currency_format": "Always format numbers as Rp XX.XXX using locale ID ('id-ID')."
+  }
+}
