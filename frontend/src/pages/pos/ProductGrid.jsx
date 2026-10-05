@@ -38,8 +38,8 @@ export const ProductGrid = memo(function ProductGrid({ items, cols, onPick, padB
     setSt((s) => ({ ...s, top: 0 }));
   }, [items]);
   const rows = Math.ceil(items.length / cols);
-  const first = Math.max(0, Math.floor(st.top / ROW) - 3);
-  const last = Math.min(rows, Math.ceil((st.top + st.h) / ROW) + 3);
+  const first = Math.max(0, Math.floor(st.top / ROW) - 6);
+  const last = Math.min(rows, Math.ceil((st.top + st.h) / ROW) + 6);
   const out = [];
   for (let r = first; r < last; r++) {
     out.push(
@@ -49,7 +49,7 @@ export const ProductGrid = memo(function ProductGrid({ items, cols, onPick, padB
     );
   }
   return (
-    <div ref={ref} data-testid="pos-product-grid" onScroll={(e) => setSt((s) => ({ ...s, top: e.currentTarget.scrollTop }))} className="flex-1 min-h-0 overflow-y-auto px-2 pt-2">
+    <div ref={ref} data-testid="pos-product-grid" onScroll={(e) => { const top = e.currentTarget.scrollTop; setSt((s) => ({ ...s, top })); }} className="flex-1 min-h-0 overflow-y-auto px-2 pt-2">
       {items.length === 0 && <div className="text-center text-slate-400 py-10 text-sm">Produk tidak ditemukan</div>}
       <div className="relative" style={{ height: rows * ROW + (padBottom ? 96 : 8) }}>{out}</div>
     </div>
