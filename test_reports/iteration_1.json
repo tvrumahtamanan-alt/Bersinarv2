@@ -1,0 +1,43 @@
+{
+  "summary": "First-run smoke+integration tests on BERSINAR POS. Backend 27/27 pytests pass serially (1 flake under -n2 parallel because two parallel tests mutated stock on the same seed product; not a product bug). Frontend login, kasir1 location/menu scoping, POS catalog/scanner, online shop checkout+track, Products ProductForm scanner behavior, Orders staff listing, Settings and Low Stock pages all working against public URL.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/transactions", "issue": "POS does not block overselling (stock can go negative). Seed Indomie Goreng went to Stok -8 after a qty-10 POS sale on seed-provided ~2 stock. If intentional (allow negative), ok; else enforce guard like /orders accept uses atomic $gte."},
+      {"endpoint": "pytest.ini (-n 2 loadscope)", "issue": "Parallel workers can race because many tests mutate same seed catalog (first product in Cabang 1). TestOrderFlow failed intermittently when TestStock.waste consumed stock concurrently. Mitigation: pin stock tests to a dedicated TEST_ product or use loadfile/loadgroup."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "POS product card", "issues": ["No visual disable when stock<=0 (card still clickable). Combined with backend accepting negative stock, user can oversell silently."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_bersinar_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Decide and enforce overselling policy on POS /api/transactions (block or warn when stock<it.qty, consistent with /orders/{id}/status action=accept atomic check).",
+    "Optionally harden ProductCard to disable or dim when stock<=0 (shop page already shows 'Habis').",
+    "If flaky backend tests remain, scope stock-mutating tests to dedicated TEST_ products instead of cat[0]."
+  ],
+  "critical_code_review_comments": [
+    "Scanner (lib/scanner.js) correctly snapshots and restores active input value after a scan — verified for ProductForm (name field preserved while SKU filled).",
+    "routes_sales.insert_transaction decrements stock with $inc without a stock>=qty guard; use conditional update (as in accept_order) for consistency.",
+    "routes_orders.create_order correctly rejects decimal qty for non-decimal products and checks tier via apply_tier.",
+    "core.LOCATIONS and allowed_locations handled consistently; kasir1 verified bound to Cabang 1.",
+    "server.py uses on_event startup/shutdown (deprecated in FastAPI; consider lifespan). Non-blocking."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_bersinar_api.py (new)"
+  ],
+  "success_rate": {"backend": "100% (27/27 serial; 26/27 under parallel loadscope due to intra-suite race)", "frontend": "~95% (all critical flows verified: login, role scoping, POS catalog+scanner, shop checkout+track, product form scan, orders page)"},
+  "test_credentials": "admin/123456, kasir1/1111 (Cabang 1), kasir2/2222 (Cabang 2), gudang/3333. B2B 081200000001 / 1234. Verified login + role-scoped navbar locations + Settings menu hidden for Kasir.",
+  "seed_data_creation": "Created a few TEST_ transactions, TEST_Produk1 product, TEST_Online and TEST_Flow online orders, and small expense/waste/transfer records for Cabang 1 during tests. Admin shift in Cabang 1 and kasir1 shift in Cabang 1 both open at end of run.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test suite at /app/backend/tests/test_bersinar_api.py is reusable. Flaky TestOrderFlow under -n2 is a test-interference artifact; passes with -n 0. Scanner behavior for ProductForm already verified. Bluetooth printing and fullscreen 4->5 grid toggle require real browser context and were skipped per request. POS admin shift in Cabang 1 remains open across runs; close it manually if needed. Permissions were NOT modified during this run (Kasir role untouched).",
+  "rca_of_minor_issue": "TestOrderFlow failure under parallel runners: both TestStock.test_waste and TestOrderFlow accept targeted the same seed product (first by alphabetical sort in Cabang 1). While TestOrderFlow measured 'before' stock and awaited accept, TestStock concurrently decremented 1 unit via waste, so 'after' was before-2. Running with -n 0 (or isolating these two tests to a dedicated TEST_ product) resolves it. Not an application bug."
+}

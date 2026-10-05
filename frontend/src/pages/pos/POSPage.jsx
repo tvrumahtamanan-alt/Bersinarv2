@@ -155,8 +155,8 @@ export default function POSPage() {
       {md && <aside className="w-[38%] flex flex-col min-h-0">{cart_}</aside>}
       {!md && count > 0 && !sheet && (
         <button data-testid="floating-cart-bar" onClick={() => setSheet(true)} className="fixed bottom-4 left-4 right-4 z-40 h-14 rounded-xl bg-emerald-700 text-white flex items-center justify-between px-4 border border-emerald-800">
-          <span className="mono font-bold">[ {count} Item | {rp(totals.total)} ]</span>
-          <span className="flex items-center gap-2 font-bold"><ShoppingCart size={18} />Lihat Keranjang</span>
+          <span className="mono font-bold text-sm whitespace-nowrap">[ {count} Item | {rp(totals.total)} ]</span>
+          <span className="flex items-center gap-2 font-bold text-sm whitespace-nowrap"><ShoppingCart size={18} />Lihat Keranjang</span>
         </button>
       )}
       {!md && sheet && (
